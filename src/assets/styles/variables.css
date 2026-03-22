@@ -1,0 +1,77 @@
+:root {
+  /* 色彩系统 */
+  --primary-color: #165DFF;
+  --success-color: #00B42A;
+  --warning-color: #FF7D00;
+  --danger-color: #F53F3F;
+  --info-color: #86909C;
+  
+  /* 中性色 */
+  --text-color-primary: #1D2129;
+  --text-color-regular: #4E5969;
+  --text-color-secondary: #86909C;
+  --text-color-placeholder: #C9CDD4;
+  --border-color: #E5E6EB;
+  --border-color-light: #F2F3F5;
+  --background-color: #F5F6FA;
+  --card-background: #FFFFFF;
+  
+  /* 字体系统 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  --font-size-xxxl: 30px;
+  
+  /* 字重 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* 行高 */
+  --line-height-title: 1.2;
+  --line-height-text: 1.5;
+  --line-height-small: 1.4;
+  
+  /* 间距系统 (8px 基准) */
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+  --spacing-xxl: 64px;
+  
+  /* 圆角系统 */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-full: 9999px;
+  
+  /* 阴影系统 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  
+  /* 过渡动画 */
+  --transition-fast: 0.2s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-color-primary: #F5F6FA;
+    --text-color-regular: #C9CDD4;
+    --text-color-secondary: #86909C;
+    --text-color-placeholder: #4E5969;
+    --border-color: #4E5969;
+    --border-color-light: #2E3440;
+    --background-color: #1D2129;
+    --card-background: #2E3440;
+  }
+}
