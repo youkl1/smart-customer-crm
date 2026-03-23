@@ -100,6 +100,37 @@
 - **影响范围**：全局样式
 - **验证结果**：样式统一，符合设计规范
 
+### 2024-01-01
+- **修改人**：AI自动执行
+- **修改文件**：
+  - `src/views/mobile/Layout.vue`
+  - `src/views/mobile/customer/Add.vue`
+  - `src/views/mobile/customer/Edit.vue`
+  - `src/views/mobile/business/Add.vue`
+  - `src/views/mobile/business/Edit.vue`
+  - `src/views/mobile/task/Add.vue`
+  - `src/views/mobile/task/Edit.vue`
+- **修改原因**：完善顶部按钮功能
+- **修改内容**：
+  1. 修改了Layout组件，实现了与子组件的通信机制
+  2. 添加了handleHeaderRightClick函数，处理顶部右侧按钮的点击事件
+  3. 确保所有子组件正确注册保存回调
+  4. 优化了顶部按钮的显示逻辑
+- **影响范围**：移动端所有页面的顶部导航栏
+- **验证结果**：顶部按钮功能正常，能够正确执行保存、新增、编辑操作
+
+### 2024-01-01
+- **修改人**：AI自动执行
+- **修改文件**：
+  - `src/views/mobile/customer/List.vue`
+- **修改原因**：修复新增客户按钮布局异常
+- **修改内容**：
+  1. 调整了新增客户按钮的尺寸和定位方式
+  2. 优化了按钮的CSS样式，确保在不同屏幕尺寸下都能正确显示
+  3. 修复了按钮点击时的transform样式
+- **影响范围**：移动端客户列表页面
+- **验证结果**：新增客户按钮布局正常，不再超出范围，点击效果正常
+
 ## 版本历史
 
 | 版本号 | 发布日期 | 主要变更 |
