@@ -1,16 +1,17 @@
 <template>
   <div class="mobile-layout">
     <!-- 顶部标题栏 -->
-    <van-nav-bar 
-  :title="currentTitle"
-  :left-text="showBack ? '返回' : ''"
-  @click-left="handleBack"
-  :right-text="showSave ? '保存' : showAdd ? '新增' : showEdit ? '编辑' : ''"
-  @click-right="showSave ? handleSave : showAdd ? handleAdd : showEdit ? handleEdit : null"
-  :style="{ backgroundColor: 'var(--primary-color)', color: '#fff', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)' }"
-  left-text-color="#fff"
-  right-text-color="#fff"
-/>
+    <div class="header" :style="{ backgroundColor: 'var(--primary-color)', color: '#fff', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)' }">
+      <div class="header-left" v-if="showBack" @click="handleBack">
+        返回
+      </div>
+      <div class="header-center">
+        {{ currentTitle }}
+      </div>
+      <div class="header-right" @click="handleHeaderRightClick">
+        {{ showSave ? '保存' : showAdd ? '新增' : showEdit ? '编辑' : '' }}
+      </div>
+    </div>
     
     <!-- 内容区域 -->
     <div class="content">
@@ -23,27 +24,48 @@
     
     <!-- 底部导航栏 -->
     <div class="tabbar-container">
-      <van-tabbar v-model="activeTab" @change="handleTabChange" route>
-        <van-tabbar-item icon="contact" to="/mobile/home">
-          客户
-        </van-tabbar-item>
-        <van-tabbar-item icon="star" to="/mobile/business">
-          商机
-        </van-tabbar-item>
-        <van-tabbar-item icon="todo-list" to="/mobile/task">
-          任务
-        </van-tabbar-item>
-        <van-tabbar-item icon="user" to="/mobile/profile">
-          我的
-        </van-tabbar-item>
-      </van-tabbar>
+      <div class="tabbar">
+        <div 
+          class="tabbar-item" 
+          :class="{ active: activeTab === '/mobile/home' }"
+          @click="handleTabClick('/mobile/home')"
+        >
+          <span class="tabbar-icon">👥</span>
+          <span class="tabbar-text">客户</span>
+        </div>
+        <div 
+          class="tabbar-item" 
+          :class="{ active: activeTab === '/mobile/business' }"
+          @click="handleTabClick('/mobile/business')"
+        >
+          <span class="tabbar-icon">⭐</span>
+          <span class="tabbar-text">商机</span>
+        </div>
+        <div 
+          class="tabbar-item" 
+          :class="{ active: activeTab === '/mobile/task' }"
+          @click="handleTabClick('/mobile/task')"
+        >
+          <span class="tabbar-icon">📋</span>
+          <span class="tabbar-text">任务</span>
+        </div>
+        <div 
+          class="tabbar-item" 
+          :class="{ active: activeTab === '/mobile/profile' }"
+          @click="handleTabClick('/mobile/profile')"
+        >
+          <span class="tabbar-icon">👤</span>
+          <span class="tabbar-text">我的</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, provide } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { showToast } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
@@ -66,6 +88,14 @@ const showAdd = ref(false)
 // 是否显示编辑按钮
 const showEdit = ref(false)
 
+// 保存回调函数
+const saveCallback = ref(null)
+
+// 提供保存方法给子组件
+provide('setSaveCallback', (callback) => {
+  saveCallback.value = callback
+})
+
 // 页面标题映射
 const titleMap = {
   '/mobile/home': '客户管理',
@@ -81,6 +111,9 @@ const titleMap = {
 watch(
   () => route.path,
   (newPath) => {
+    // 重置保存回调
+    saveCallback.value = null
+    
     // 更新激活的标签
     if (newPath.startsWith('/mobile/home')) {
       activeTab.value = '/mobile/home'
@@ -99,6 +132,8 @@ watch(
       currentTitle.value = '编辑客户'
     } else if (newPath.startsWith('/mobile/customer/add')) {
       currentTitle.value = '新增客户'
+    } else if (newPath.startsWith('/mobile/customer/sea')) {
+      currentTitle.value = '客户公海池'
     } else if (newPath.startsWith('/mobile/business/detail')) {
       currentTitle.value = '商机详情'
     } else if (newPath.startsWith('/mobile/business/edit')) {
@@ -117,6 +152,12 @@ watch(
       currentTitle.value = '编辑任务'
     } else if (newPath.startsWith('/mobile/task/add')) {
       currentTitle.value = '新增任务'
+    } else if (newPath.startsWith('/mobile/follow/add')) {
+      currentTitle.value = '添加跟进记录'
+    } else if (newPath.startsWith('/mobile/profile/edit')) {
+      currentTitle.value = '编辑个人信息'
+    } else if (newPath.startsWith('/mobile/profile/password')) {
+      currentTitle.value = '修改密码'
     } else {
       for (const [path, title] of Object.entries(titleMap)) {
         if (newPath.startsWith(path)) {
@@ -127,13 +168,13 @@ watch(
     }
     
     // 更新返回按钮显示状态
-    showBack.value = !['/mobile/home', '/mobile/business', '/mobile/task', '/mobile/profile'].includes(newPath)
+    showBack.value = !['/mobile/home', '/mobile/business', '/mobile/task', '/mobile/profile', '/mobile/contact', '/mobile/report', '/mobile/message'].includes(newPath)
     
     // 更新保存按钮显示状态
     showSave.value = newPath.includes('/add') || newPath.includes('/edit')
     
     // 更新新增按钮显示状态
-    showAdd.value = ['/mobile/home', '/mobile/business', '/mobile/contact', '/mobile/task'].includes(newPath)
+    showAdd.value = ['/mobile/home', '/mobile/business', '/mobile/contact', '/mobile/task', '/mobile/report', '/mobile/message'].includes(newPath)
     
     // 更新编辑按钮显示状态
     showEdit.value = newPath.includes('/detail/')
@@ -161,12 +202,23 @@ const handleTabChange = (value) => {
   }
 }
 
+// 处理底部导航栏点击
+const handleTabClick = (path) => {
+  activeTab.value = path
+  router.push(path)
+}
+
 // 处理保存按钮点击
 const handleSave = () => {
-  // 触发当前页面的保存方法
-  // 这里需要使用事件总线或其他方式与子组件通信
-  // 暂时使用alert提示
-  alert('保存按钮点击')
+  if (saveCallback.value) {
+    saveCallback.value()
+  } else {
+    showToast({
+      message: '保存功能未实现',
+      type: 'warning',
+      duration: 2000
+    })
+  }
 }
 
 // 处理新增按钮点击
@@ -181,6 +233,12 @@ const handleAdd = () => {
     router.push('/mobile/contact/add')
   } else if (currentPath === '/mobile/task') {
     router.push('/mobile/task/add')
+  } else if (currentPath === '/mobile/report') {
+    // 报表看板页面可以跳转到新增客户或新增商机
+    router.push('/mobile/customer/add')
+  } else if (currentPath === '/mobile/message') {
+    // 消息通知页面可以跳转到个人中心
+    router.push('/mobile/profile')
   }
 }
 
@@ -202,6 +260,17 @@ const handleEdit = () => {
     router.push(`/mobile/task/edit/${id}`)
   }
 }
+
+// 处理顶部右侧按钮点击
+const handleHeaderRightClick = () => {
+  if (showSave.value) {
+    handleSave()
+  } else if (showAdd.value) {
+    handleAdd()
+  } else if (showEdit.value) {
+    handleEdit()
+  }
+}
 </script>
 
 <style scoped>
@@ -214,6 +283,36 @@ const handleEdit = () => {
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  padding: 0 var(--spacing-sm);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 10;
+}
+
+.header-left {
+  width: 60px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.header-center {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.header-right {
+  width: 60px;
+  text-align: right;
+  cursor: pointer;
 }
 
 .content {
@@ -232,6 +331,42 @@ const handleEdit = () => {
   background-color: var(--card-background);
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   z-index: 100;
+}
+
+.tabbar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 50px;
+}
+
+.tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tabbar-item:active {
+  background-color: var(--border-color-light);
+}
+
+.tabbar-item.active {
+  color: var(--primary-color);
+}
+
+.tabbar-icon {
+  font-size: var(--font-size-lg);
+  margin-bottom: 2px;
+}
+
+.tabbar-text {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
 }
 
 .fade-enter-active,

@@ -1,13 +1,13 @@
 <template>
   <div class="business-detail">
     <!-- 基本信息 -->
-    <van-card class="info-card" :style="{ margin: 'var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title>
+    <div class="info-card" :style="{ margin: 'var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="business-header">
         <div class="business-name">{{ business.name }}</div>
         <div class="business-stage" :class="`stage-${business.stage}`">
           {{ stageMap[business.stage] }}
         </div>
-      </template>
+      </div>
       <div class="info-item">
         <span class="label">客户：</span>
         <span class="value">{{ business.customer }}</span>
@@ -36,11 +36,13 @@
         <span class="label">商机描述：</span>
         <span class="value">{{ business.description }}</span>
       </div>
-    </van-card>
+    </div>
     
     <!-- 产品列表 -->
-    <van-card class="products-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title><span class="card-title-text">产品明细</span></template>
+    <div class="products-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="card-title">
+        <span class="card-title-text">产品明细</span>
+      </div>
       <div class="products-list">
         <div 
           v-for="(product, index) in business.products" 
@@ -55,11 +57,13 @@
           <div class="total-price">¥{{ business.amount.toLocaleString() }}</div>
         </div>
       </div>
-    </van-card>
+    </div>
     
     <!-- 销售漏斗 -->
-    <van-card class="funnel-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title><span class="card-title-text">销售漏斗</span></template>
+    <div class="funnel-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="card-title">
+        <span class="card-title-text">销售漏斗</span>
+      </div>
       <div class="funnel-container">
         <div 
           v-for="(stage, index) in stages" 
@@ -74,23 +78,21 @@
           <div class="stage-line"></div>
         </div>
       </div>
-    </van-card>
+    </div>
     
     <!-- 跟进记录 -->
-    <van-card class="follow-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title>
-        <div class="card-title">
-          <span class="card-title-text">跟进记录</span>
-          <van-button 
-            type="primary" 
-            size="small" 
-            :style="{ backgroundColor: 'var(--primary-color)' }"
-            @click="addFollow"
-          >
-            添加
-          </van-button>
-        </div>
-      </template>
+    <div class="follow-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="card-title">
+        <span class="card-title-text">跟进记录</span>
+        <van-button 
+          type="primary" 
+          size="small" 
+          :style="{ backgroundColor: 'var(--primary-color)' }"
+          @click="addFollow"
+        >
+          添加
+        </van-button>
+      </div>
       <div v-if="follows.length === 0" class="empty-text">
         暂无跟进记录
       </div>
@@ -106,7 +108,7 @@
           <div class="follow-user">{{ follow.user }}</div>
         </div>
       </div>
-    </van-card>
+    </div>
     
     <!-- 底部操作按钮 -->
     <div class="bottom-actions">
@@ -283,11 +285,18 @@ onMounted(() => {
   margin-bottom: var(--spacing-sm);
 }
 
+.business-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
 .business-name {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   color: var(--text-color-primary);
   margin-right: var(--spacing-sm);
+  flex: 1;
 }
 
 .business-stage {

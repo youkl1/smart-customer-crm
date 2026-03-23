@@ -66,12 +66,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
+const setSaveCallback = inject('setSaveCallback')
 
 // 客户状态映射
 const statusMap = {
@@ -127,6 +128,11 @@ onMounted(() => {
     email: 'zhangsan@example.com',
     address: '北京市朝阳区',
     status: 'active'
+  }
+  
+  // 注册保存回调
+  if (setSaveCallback) {
+    setSaveCallback(saveCustomer)
   }
 })
 </script>

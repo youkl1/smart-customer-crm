@@ -1,16 +1,14 @@
 <template>
   <div class="customer-detail">
     <!-- 基本信息 -->
-    <van-card class="info-card" :style="{ margin: 'var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title>
-        <div class="customer-header">
-          <div class="customer-name">{{ customer.name }}</div>
-          <div class="customer-status" :class="`status-${customer.status}`">
-            {{ statusMap[customer.status] }}
-          </div>
+    <div class="info-card" :style="{ margin: 'var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="customer-header">
+        <div class="customer-name">{{ customer.name }}</div>
+        <div class="customer-status" :class="`status-${customer.status}`">
+          {{ statusMap[customer.status] }}
         </div>
-        <div class="customer-company">{{ customer.company }}</div>
-      </template>
+      </div>
+      <div class="customer-company">{{ customer.company }}</div>
       <div class="info-grid">
         <div class="info-row">
           <div class="info-item">
@@ -49,7 +47,7 @@
           </div>
         </div>
       </div>
-    </van-card>
+    </div>
     
     <!-- 统计信息卡片 -->
     <div class="stats-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
@@ -74,20 +72,18 @@
     </div>
     
     <!-- 联系人列表 -->
-    <van-card class="contact-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title>
-        <div class="card-title">
-          <span class="card-title-text">联系人</span>
-          <van-button 
-            type="primary" 
-            size="small" 
-            :style="{ backgroundColor: 'var(--primary-color)' }"
-            @click="addContact"
-          >
-            添加
-          </van-button>
-        </div>
-      </template>
+    <div class="contact-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="card-title">
+        <span class="card-title-text">联系人</span>
+        <van-button 
+          type="primary" 
+          size="small" 
+          :style="{ backgroundColor: 'var(--primary-color)' }"
+          @click="addContact"
+        >
+          添加
+        </van-button>
+      </div>
       <div v-if="contacts.length === 0" class="empty-text">
         暂无联系人
       </div>
@@ -109,23 +105,21 @@
           </div>
         </div>
       </div>
-    </van-card>
+    </div>
     
     <!-- 跟进记录 -->
-    <van-card class="follow-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title>
-        <div class="card-title">
-          <span class="card-title-text">跟进记录</span>
-          <van-button 
-            type="primary" 
-            size="small" 
-            :style="{ backgroundColor: 'var(--primary-color)' }"
-            @click="addFollow"
-          >
-            添加
-          </van-button>
-        </div>
-      </template>
+    <div class="follow-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="card-title">
+        <span class="card-title-text">跟进记录</span>
+        <van-button 
+          type="primary" 
+          size="small" 
+          :style="{ backgroundColor: 'var(--primary-color)' }"
+          @click="addFollow"
+        >
+          添加
+        </van-button>
+      </div>
       <div v-if="follows.length === 0" class="empty-text">
         暂无跟进记录
       </div>
@@ -143,23 +137,21 @@
           <div v-if="follow.remark" class="follow-remark">{{ follow.remark }}</div>
         </div>
       </div>
-    </van-card>
+    </div>
     
     <!-- 商机列表 -->
-    <van-card class="business-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title>
-        <div class="card-title">
-          <span class="card-title-text">商机</span>
-          <van-button 
-            type="primary" 
-            size="small" 
-            :style="{ backgroundColor: 'var(--primary-color)' }"
-            @click="addBusiness"
-          >
-            添加
-          </van-button>
-        </div>
-      </template>
+    <div class="business-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="card-title">
+        <span class="card-title-text">商机</span>
+        <van-button 
+          type="primary" 
+          size="small" 
+          :style="{ backgroundColor: 'var(--primary-color)' }"
+          @click="addBusiness"
+        >
+          添加
+        </van-button>
+      </div>
       <div v-if="businesses.length === 0" class="empty-text">
         暂无商机
       </div>
@@ -182,23 +174,21 @@
           </div>
         </div>
       </div>
-    </van-card>
+    </div>
     
     <!-- 任务列表 -->
-    <van-card class="task-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)' }">
-      <template #title>
-        <div class="card-title">
-          <span class="card-title-text">任务</span>
-          <van-button 
-            type="primary" 
-            size="small" 
-            :style="{ backgroundColor: 'var(--primary-color)' }"
-            @click="addTask"
-          >
-            添加
-          </van-button>
-        </div>
-      </template>
+    <div class="task-card" :style="{ margin: '0 var(--spacing-sm) var(--spacing-sm)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-sm)', backgroundColor: 'var(--card-background)', padding: 'var(--spacing-sm)' }">
+      <div class="card-title">
+        <span class="card-title-text">任务</span>
+        <van-button 
+          type="primary" 
+          size="small" 
+          :style="{ backgroundColor: 'var(--primary-color)' }"
+          @click="addTask"
+        >
+          添加
+        </van-button>
+      </div>
       <div v-if="tasks.length === 0" class="empty-text">
         暂无任务
       </div>
@@ -219,7 +209,7 @@
           </div>
         </div>
       </div>
-    </van-card>
+    </div>
     
     <!-- 底部操作按钮 -->
     <div class="bottom-actions">

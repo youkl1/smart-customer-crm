@@ -2,41 +2,63 @@
   <div class="business-list">
     <!-- 筛选器 -->
     <div class="filter-bar">
-      <van-dropdown-menu>
-        <van-dropdown-item
-          v-model="stageFilter"
-          :options="stageOptions"
-          placeholder="按阶段筛选"
-        />
-      </van-dropdown-menu>
+      <div class="filter-dropdown">
+        <div class="filter-label" @click="toggleFilter">
+          {{ getFilterText() }}
+          <span class="filter-arrow">▼</span>
+        </div>
+        <div class="filter-options" v-if="showFilter">
+          <div 
+            v-for="option in stageOptions" 
+            :key="option.value"
+            class="filter-option"
+            @click="selectStage(option.value)"
+          >
+            {{ option.text }}
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- 商机列表 -->
-    <van-list
-      v-model:loading="loading"
-      :finished="finished"
-      finished-text="没有更多数据了"
-      @load="loadData"
-    >
-      <div
-        v-for="business in businessList"
-        :key="business.id"
-        class="business-item"
-        @click="viewBusinessDetail(business.id)"
-      >
-        <div class="business-header">
-          <div class="business-name">{{ business.name }}</div>
-          <div class="business-stage" :class="`stage-${business.stage}`">
-            {{ stageMap[business.stage] }}
+    <div class="business-list-container">
+      <!-- 商机列表 -->
+      <div class="business-items">
+        <div
+          v-for="business in businessList"
+          :key="business.id"
+          class="business-item"
+          @click="viewBusinessDetail(business.id)"
+        >
+          <div class="business-header">
+            <div class="business-name">{{ business.name }}</div>
+            <div class="business-stage" :class="`stage-${business.stage}`">
+              {{ stageMap[business.stage] }}
+            </div>
           </div>
+          <div class="business-info">
+            <div class="business-amount">¥{{ business.amount }}</div>
+            <div class="business-date">预计成交：{{ business.expectedDate }}</div>
+          </div>
+          <div class="business-customer">客户：{{ business.customer }}</div>
         </div>
-        <div class="business-info">
-          <div class="business-amount">¥{{ business.amount }}</div>
-          <div class="business-date">预计成交：{{ business.expectedDate }}</div>
-        </div>
-        <div class="business-customer">客户：{{ business.customer }}</div>
       </div>
-    </van-list>
+      
+      <!-- 加载更多提示 -->
+      <div class="load-more" v-if="loading">
+        加载中...
+      </div>
+      
+      <!-- 没有更多数据提示 -->
+      <div class="no-more" v-if="finished && businessList.length > 0">
+        没有更多数据了
+      </div>
+      
+      <!-- 空状态提示 -->
+      <div class="empty-state" v-if="businessList.length === 0 && !loading">
+        暂无商机数据
+      </div>
+    </div>
   </div>
 </template>
 
@@ -64,6 +86,9 @@ const stageOptions = Object.values(stageMap).map((value, index) => ({
 
 // 阶段筛选
 const stageFilter = ref('')
+
+// 筛选菜单显示状态
+const showFilter = ref(false)
 
 // 加载状态
 const loading = ref(false)
@@ -96,6 +121,25 @@ const businessList = ref([
     customer: 'DEF科技有限公司'
   }
 ])
+
+// 筛选相关方法
+const toggleFilter = () => {
+  showFilter.value = !showFilter.value
+}
+
+const selectStage = (value) => {
+  stageFilter.value = value
+  showFilter.value = false
+  // 这里可以添加筛选逻辑
+}
+
+const getFilterText = () => {
+  if (!stageFilter.value) {
+    return '按阶段筛选'
+  }
+  const option = stageOptions.find(opt => opt.value === stageFilter.value)
+  return option ? option.text : '按阶段筛选'
+}
 
 // 加载数据
 const loadData = () => {

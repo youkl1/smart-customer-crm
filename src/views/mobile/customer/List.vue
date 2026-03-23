@@ -2,27 +2,50 @@
   <div class="customer-list">
     <!-- 搜索和筛选 -->
     <div class="search-bar">
-      <van-search
-        v-model="keyword"
-        placeholder="搜索客户姓名/电话"
-        @search="handleSearch"
-        shape="round"
-        background="#f5f5f5"
-      />
-      <van-dropdown-menu class="filter-menu">
-        <van-dropdown-item v-model="status" :options="statusOptions" />
-      </van-dropdown-menu>
+      <div class="search-input">
+        <input 
+          type="text" 
+          v-model="keyword" 
+          placeholder="搜索客户姓名/电话"
+          class="search-input-field"
+          @keyup.enter="handleSearch"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+      <div class="filter-menu">
+        <div class="filter-dropdown">
+          <div class="filter-label" @click="toggleFilter">
+            {{ getStatusText() }}
+            <span class="filter-arrow">▼</span>
+          </div>
+          <div class="filter-options" v-if="showFilter">
+            <div 
+              v-for="option in statusOptions" 
+              :key="option.value"
+              class="filter-option"
+              @click="selectStatus(option.value)"
+            >
+              {{ option.text }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- 客户列表 -->
-    <van-pull-refresh v-model="refreshing" @refresh="handleRefresh">
-      <van-list
-        v-model:loading="loading"
-        :finished="finished"
-        finished-text="没有更多数据了"
-        @load="handleLoad"
-        class="customer-list-container"
-      >
+    <div class="customer-list-container" 
+         @touchstart="handleTouchStart" 
+         @touchmove="handleTouchMove" 
+         @touchend="handleTouchEnd"
+         ref="listContainer"
+    >
+      <!-- 下拉刷新提示 -->
+      <div class="refresh-tip" v-if="refreshing">
+        刷新中...
+      </div>
+      
+      <!-- 客户列表 -->
+      <div class="customer-items">
         <div 
           v-for="customer in customers" 
           :key="customer.id"
@@ -38,36 +61,45 @@
               </span>
             </div>
           </div>
-          <van-icon name="arrow" class="customer-arrow" />
+          <span class="customer-arrow">›</span>
         </div>
-      </van-list>
-    </van-pull-refresh>
+      </div>
+      
+      <!-- 加载更多提示 -->
+      <div class="load-more" v-if="loading">
+        加载中...
+      </div>
+      
+      <!-- 没有更多数据提示 -->
+      <div class="no-more" v-if="finished && customers.length > 0">
+        没有更多数据了
+      </div>
+      
+      <!-- 空状态提示 -->
+      <div class="empty-state" v-if="customers.length === 0 && !loading">
+        暂无客户数据
+      </div>
+    </div>
     
     <!-- 公海池入口 -->
     <div class="sea-pool-entry" @click="handleSeaPool">
-      <van-icon name="water" class="sea-pool-icon" />
+      <span class="sea-pool-icon">🌊</span>
       <span>客户公海池</span>
-      <van-icon name="arrow" />
+      <span class="arrow-icon">›</span>
     </div>
     
     <!-- 新增客户按钮 -->
-    <van-button
-      type="primary"
-      round
-      class="add-button"
-      @click="handleAddCustomer"
-      size="large"
-    >
-      <van-icon name="plus" /> 新增客户
-    </van-button>
+    <div class="add-button" @click="handleAddCustomer">
+      <span class="add-icon">+</span>
+      <span class="add-text">新增客户</span>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { get } from '../../../utils/request'
-import { showToast } from 'vant'
 
 const router = useRouter()
 
@@ -84,6 +116,9 @@ const statusOptions = [
   { text: '流失客户', value: '流失客户' }
 ]
 
+// 筛选菜单显示状态
+const showFilter = ref(false)
+
 // 客户列表数据
 const customers = ref([])
 
@@ -95,6 +130,55 @@ const refreshing = ref(false)
 // 分页参数
 const page = ref(1)
 const pageSize = ref(10)
+
+// 下拉刷新相关
+const listContainer = ref(null)
+const startY = ref(0)
+const scrollTop = ref(0)
+const isPulling = ref(false)
+
+// 筛选相关方法
+const toggleFilter = () => {
+  showFilter.value = !showFilter.value
+}
+
+const selectStatus = (value) => {
+  status.value = value
+  showFilter.value = false
+  page.value = 1
+  finished.value = false
+  loadCustomers()
+}
+
+const getStatusText = () => {
+  const option = statusOptions.find(opt => opt.value === status.value)
+  return option ? option.text : '全部'
+}
+
+// 下拉刷新相关方法
+const handleTouchStart = (e) => {
+  startY.value = e.touches[0].clientY
+  scrollTop.value = listContainer.value.scrollTop
+}
+
+const handleTouchMove = (e) => {
+  if (scrollTop.value <= 0 && !refreshing.value) {
+    const currentY = e.touches[0].clientY
+    const diff = currentY - startY.value
+    if (diff > 50) {
+      isPulling.value = true
+      e.preventDefault()
+    }
+  }
+}
+
+const handleTouchEnd = () => {
+  if (isPulling.value) {
+    refreshing.value = true
+    isPulling.value = false
+    handleRefresh()
+  }
+}
 
 // 加载客户列表
 const loadCustomers = async () => {
@@ -183,18 +267,100 @@ onMounted(() => {
   padding: var(--spacing-sm);
   min-height: 100%;
   background-color: var(--background-color);
+  position: relative;
 }
 
 .search-bar {
   margin-bottom: var(--spacing-sm);
 }
 
+.search-input {
+  position: relative;
+  margin-bottom: var(--spacing-xs);
+}
+
+.search-input-field {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-full);
+  background-color: #f5f5f5;
+  font-size: var(--font-size-sm);
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-color-secondary);
+}
+
 .filter-menu {
-  margin-top: var(--spacing-xs);
+  position: relative;
+}
+
+.filter-dropdown {
+  position: relative;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background-color: var(--card-background);
+  font-size: var(--font-size-sm);
+  color: var(--text-color-primary);
+  cursor: pointer;
+}
+
+.filter-arrow {
+  font-size: var(--font-size-xs);
+  color: var(--text-color-secondary);
+}
+
+.filter-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  margin-top: -1px;
+}
+
+.filter-option {
+  padding: 12px 15px;
+  font-size: var(--font-size-sm);
+  color: var(--text-color-primary);
+  border-bottom: 1px solid var(--border-color-light);
+  cursor: pointer;
+}
+
+.filter-option:last-child {
+  border-bottom: none;
+}
+
+.filter-option:active {
+  background-color: var(--border-color-light);
 }
 
 .customer-list-container {
   background-color: transparent;
+  margin-bottom: var(--spacing-sm);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.customer-items {
+  margin-bottom: var(--spacing-sm);
 }
 
 .customer-item {
@@ -265,6 +431,8 @@ onMounted(() => {
 
 .customer-arrow {
   color: var(--text-color-secondary);
+  font-size: var(--font-size-lg);
+  font-weight: bold;
 }
 
 .sea-pool-entry {
@@ -286,6 +454,7 @@ onMounted(() => {
 
 .sea-pool-icon {
   color: var(--primary-color);
+  font-size: var(--font-size-lg);
 }
 
 .sea-pool-entry span {
@@ -296,16 +465,75 @@ onMounted(() => {
   font-weight: var(--font-weight-medium);
 }
 
+.arrow-icon {
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+}
+
 .add-button {
   position: fixed;
   bottom: 70px;
   right: var(--spacing-sm);
-  width: 120px;
-  height: 44px;
+  width: 100px;
+  height: 36px;
   box-shadow: var(--shadow-md);
   z-index: 99;
   background-color: var(--primary-color);
-  border-radius: 22px;
+  border-radius: 18px;
+  font-size: var(--font-size-sm);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  max-width: calc(100% - 2 * var(--spacing-sm));
+  left: 50%;
+  transform: translateX(calc(-50% + (500px / 2) - var(--spacing-sm) - 50px));
+}
+
+.add-button:active {
+  transform: translateX(calc(-50% + (500px / 2) - var(--spacing-sm) - 50px)) scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+.add-icon {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.add-text {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.refresh-tip {
+  text-align: center;
+  padding: var(--spacing-sm);
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.load-more {
+  text-align: center;
+  padding: var(--spacing-sm);
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.no-more {
+  text-align: center;
+  padding: var(--spacing-sm);
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--text-color-secondary);
   font-size: var(--font-size-sm);
 }
 </style>

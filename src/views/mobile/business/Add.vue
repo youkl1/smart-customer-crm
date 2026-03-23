@@ -91,11 +91,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 
 const router = useRouter()
+const setSaveCallback = inject('setSaveCallback')
 
 // 商机阶段映射
 const stageMap = {
@@ -152,6 +153,13 @@ const saveBusiness = () => {
     router.push('/mobile/business')
   }, 2000)
 }
+
+// 组件挂载时注册保存回调
+onMounted(() => {
+  if (setSaveCallback) {
+    setSaveCallback(saveBusiness)
+  }
+})
 </script>
 
 <style scoped>

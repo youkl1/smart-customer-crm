@@ -78,11 +78,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 
 const router = useRouter()
+const setSaveCallback = inject('setSaveCallback')
 
 // 客户状态映射
 const statusMap = {
@@ -147,6 +148,13 @@ const afterRead = (file) => {
     address: '上海市浦东新区'
   }
 }
+
+// 组件挂载时注册保存回调
+onMounted(() => {
+  if (setSaveCallback) {
+    setSaveCallback(saveCustomer)
+  }
+})
 </script>
 
 <style scoped>

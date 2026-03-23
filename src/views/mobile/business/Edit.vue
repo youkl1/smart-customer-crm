@@ -1,15 +1,5 @@
 <template>
   <div class="business-edit">
-    <!-- 顶部导航栏 -->
-    <van-nav-bar
-      title="编辑商机"
-      left-text="返回"
-      left-arrow
-      @click-left="$router.back()"
-      right-text="保存"
-      @click-right="saveBusiness"
-    />
-    
     <!-- 表单 -->
     <van-form @submit="saveBusiness">
       <van-field
@@ -101,11 +91,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { showToast } from 'vant'
 
 const route = useRoute()
 const router = useRouter()
+const setSaveCallback = inject('setSaveCallback')
 
 // 商机阶段映射
 const stageMap = {
@@ -151,10 +143,16 @@ const saveBusiness = () => {
   console.log('保存商机信息:', businessForm.value)
   
   // 显示保存成功提示
-  alert('商机更新成功')
+  showToast({
+    message: '商机更新成功',
+    type: 'success',
+    duration: 2000
+  })
   
   // 跳转到商机详情
-  router.push(`/mobile/business/detail/${route.params.id}`)
+  setTimeout(() => {
+    router.push(`/mobile/business/detail/${route.params.id}`)
+  }, 2000)
 }
 
 // 页面加载时获取商机数据
@@ -174,11 +172,44 @@ onMounted(() => {
   
   // 设置日期选择器值
   dateValue.value = new Date(businessForm.value.expectedDate)
+  
+  // 注册保存回调
+  if (setSaveCallback) {
+    setSaveCallback(saveBusiness)
+  }
 })
 </script>
 
 <style scoped>
 .business-edit {
-  padding: 10px;
+  padding: var(--spacing-sm);
+  background-color: var(--background-color);
+  min-height: 100vh;
+}
+
+/* 自定义表单样式 */
+:deep(.van-form) {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+:deep(.van-field) {
+  margin-bottom: var(--spacing-sm);
+}
+
+:deep(.van-field__label) {
+  color: var(--text-color-regular);
+  font-size: var(--font-size-sm);
+}
+
+:deep(.van-field__input) {
+  color: var(--text-color-primary);
+  font-size: var(--font-size-base);
+}
+
+:deep(.van-field__placeholder) {
+  color: var(--text-color-placeholder);
 }
 </style>

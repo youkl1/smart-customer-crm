@@ -81,11 +81,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 
 const router = useRouter()
+const setSaveCallback = inject('setSaveCallback')
 
 // 客户选项
 const customerOptions = [
@@ -139,6 +140,13 @@ const saveTask = () => {
     router.push('/mobile/task')
   }, 2000)
 }
+
+// 组件挂载时注册保存回调
+onMounted(() => {
+  if (setSaveCallback) {
+    setSaveCallback(saveTask)
+  }
+})
 </script>
 
 <style scoped>
